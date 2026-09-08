@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ cloud backup and device-to-device transfer. See the note in
+     backup_rules.xml: WebView localStorage holds every save. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="root" path="app_webview" />
+        <exclude domain="root" path="app_webview/Default/GPUCache" />
+        <exclude domain="root" path="app_webview/GPUCache" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="root" path="app_webview" />
+    </device-transfer>
+</data-extraction-rules>

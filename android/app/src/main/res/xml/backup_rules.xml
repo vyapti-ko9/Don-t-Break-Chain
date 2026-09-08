@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 and below. All save data (progress, stars, streaks, settings)
+     lives in WebView localStorage under <data>/app_webview, so that is the one
+     thing worth carrying to a new device. -->
+<full-backup-content>
+    <include domain="root" path="app_webview" />
+    <exclude domain="root" path="app_webview/Default/GPUCache" />
+    <exclude domain="root" path="app_webview/GPUCache" />
+</full-backup-content>

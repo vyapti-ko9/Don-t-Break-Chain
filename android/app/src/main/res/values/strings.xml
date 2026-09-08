@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Don\'t Break the Chain</string>
+    <string name="title_activity_main">Don\'t Break the Chain</string>
+    <string name="package_name">com.opirasolutions.dontbreakthechain</string>
+    <string name="custom_url_scheme">com.opirasolutions.dontbreakthechain</string>
+
+    <!-- AdMob sample app ID - serves test ads only. Swap for the real one. -->
+    <string name="admob_app_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
+</resources>

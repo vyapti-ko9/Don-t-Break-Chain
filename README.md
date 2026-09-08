@@ -27,25 +27,54 @@ npm run dev          # http://localhost:5173
 | `npm run build` | Type-check (`tsc -b`) + production build to `dist/` |
 | `npm run preview` | Serve the production build locally |
 | `npm run typecheck` | Types only, no emit |
+| `npm run cap:sync` | `build` + copy `dist/` into the Android project |
+| `npm run assets` | Regenerate launcher icons and splash images |
 
 ## Android / Capacitor
 
-The web build is self-contained (relative `base`, no backend, no network). To
-wrap it for the Play Store:
+The Android project in [`android/`](./android) is checked in - it carries the
+manifest, the AdMob wiring, the generated icons and the release signing setup,
+so it is not disposable. Rebuild the web layer and copy it across with:
 
 ```bash
-npm run build
-npx cap add android          # first time only  (or: npm run cap:add:android)
-npx cap sync                  # copy dist/ into the native project
-npx cap open android          # open in Android Studio -> build APK/AAB
+npm run cap:sync                          # build + cap sync android
+cd android && ./gradlew bundleRelease     # signed .aab
+cd android && ./gradlew assembleDebug     # installable .apk for a device
 ```
 
-`npm run cap:sync` runs `build` + `cap sync` in one step. App id and name live in
-[`capacitor.config.ts`](./capacitor.config.ts).
+`npx cap open android` opens the same project in Android Studio.
 
-Installed native plugins: `@capacitor/app` (hardware back button),
-`@capacitor/haptics`, `@capacitor/status-bar`. All are optional at runtime - the
-game degrades gracefully in a plain browser.
+| | |
+| --- | --- |
+| Package | `com.opirasolutions.dontbreakthechain` |
+| min / target SDK | 24 / 36 |
+| Version | `1.0.0` (versionCode 1) - bump both in `android/app/build.gradle` |
+| Signing | `android/keystore.properties` -> `keystore/*.jks` (neither is in git) |
+
+Native plugins: `@capacitor/app` (hardware back button), `@capacitor/haptics`,
+`@capacitor/status-bar`, `@capacitor/splash-screen`, and
+`@capacitor-community/admob`. All are optional at runtime - the game degrades
+gracefully in a plain browser.
+
+### Ads
+
+[`services/monetization.ts`](./src/services/monetization.ts) drives an
+interstitial every three cleared levels (rate limited, never on the Daily) and a
+rewarded video that buys hints, behind Google's UMP consent flow. It ships with
+**Google's public test ad units**; set `VITE_ADMOB_INTERSTITIAL_ID` and
+`VITE_ADMOB_REWARDED_ID` (see [`.env.example`](./.env.example)) plus
+`admob_app_id` in `android/app/src/main/res/values/strings.xml` to go live.
+
+### Play Store
+
+[`store/PLAY_LISTING.md`](./store/PLAY_LISTING.md) has every Play Console field
+for the first release; [`store/privacy-policy.md`](./store/privacy-policy.md) is
+ready to host. Graphics and screenshots are generated, not hand-made:
+
+```bash
+node scripts/screenshots.mjs phone tablet-7   # store/screenshots/
+node scripts/store-graphics.mjs               # icon + feature graphic
+```
 
 ---
 
@@ -152,12 +181,13 @@ a blocked/absent `AudioContext` is a silent no-op.
 
 ## Future-proofing
 
-- **Monetization** - [`services/monetization.ts`](./src/services/monetization.ts)
-  is a no-op boundary with the exact call sites AdMob / IAP will need
-  (`maybeShowInterstitial`, `showRewardedAd`, `purchaseRemoveAds`).
+- **Monetization** - AdMob interstitial and rewarded video are wired up;
+  `purchaseRemoveAds` / `restorePurchases` in
+  [`services/monetization.ts`](./src/services/monetization.ts) remain inert
+  boundaries waiting for a billing library.
 - **Viral** - [`services/share.ts`](./src/services/share.ts) wraps the Web Share
   API with a clipboard fallback and a per-level share-text builder.
 
 ## License
 
-Proprietary - © TDG Design.
+Proprietary - © Opira Solutions.
