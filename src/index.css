@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: #0a0b12;
+    color: #f2f3f8;
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  #root {
+    display: flex;
+    flex-direction: column;
+  }
+
+  button {
+    font-family: inherit;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    margin: 0;
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply relative mx-auto flex h-full w-full max-w-[520px] flex-col overflow-hidden bg-bg;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    background-image:
+      radial-gradient(ellipse 120% 70% at 50% -10%, rgba(91, 140, 255, 0.22), transparent 55%),
+      radial-gradient(ellipse 80% 50% at 100% 100%, rgba(0, 230, 195, 0.08), transparent 45%),
+      radial-gradient(ellipse 60% 40% at 0% 80%, rgba(176, 107, 255, 0.07), transparent 40%);
+  }
+
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-2xl px-5 py-3 font-display text-base font-700 transition-transform active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-white shadow-glow;
+    background-image: linear-gradient(135deg, #6b9aff 0%, #5b8cff 45%, #4578f0 100%);
+  }
+
+  .btn-ghost {
+    @apply btn border border-line/80 bg-surface2/80 text-white backdrop-blur-sm;
+  }
+
+  .btn-danger {
+    @apply btn bg-danger text-white;
+  }
+
+  .card {
+    @apply rounded-2xl border border-line bg-surface/90 p-4 shadow-card backdrop-blur-sm;
+  }
+
+  .stat-pill {
+    @apply flex flex-col items-center rounded-xl border border-line/80 bg-surface2/70 px-3 py-2 backdrop-blur-sm;
+  }
+
+  .screen {
+    @apply relative flex h-full w-full flex-col animate-fade-in;
+  }
+
+  .scroll-area {
+    @apply flex-1 overflow-y-auto overscroll-contain px-4 pb-8;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .glass-panel {
+    @apply rounded-3xl border border-white/10 bg-surface/70 shadow-card backdrop-blur-md;
+  }
+
+  .menu-tile {
+    @apply flex flex-col items-start justify-between gap-3 rounded-2xl border border-line/70 bg-surface2/60 p-4 text-left transition-all active:scale-[0.97];
+    background-image: linear-gradient(160deg, rgba(255, 255, 255, 0.04), transparent 50%);
+  }
+
+  .menu-tile:active {
+    border-color: rgba(91, 140, 255, 0.45);
+  }
+
+  .world-banner {
+    @apply mb-3 flex items-center justify-between gap-3 rounded-2xl border px-3.5 py-3;
+    background: linear-gradient(110deg, rgba(255, 255, 255, 0.06), transparent 60%);
+  }
+
+  .level-tile {
+    @apply relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-2xl border text-center transition-all active:scale-95;
+  }
+}
