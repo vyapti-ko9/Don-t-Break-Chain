@@ -83,7 +83,7 @@ export function buildDailyLevel(day = dayNumber()): LevelDef {
     } else if (roll < 0.72) {
       maxTaps = 1;
     } else {
-      types[count - 1] = { type: 'timer', before: 2.2 + Math.floor(rand() * 2) };
+      types[count - 1] = { type: 'timer', before: Math.max(2.2 + Math.floor(rand() * 2), 1.5 + count * 0.28) };
     }
 
     // Dual-start first (rewrites topology) so later fakes/hiddens see final bombs.
@@ -165,7 +165,7 @@ export function buildDailyLevel(day = dayNumber()): LevelDef {
     fakes.push({ x: 0.5, y: 0.95 }, { x: 0.16, y: 0.5 });
     maxTaps = 1;
     if (layout === 'diamond' && rand() < 0.45) {
-      types[count - 1] = { type: 'timer', before: 2.3 + Math.floor(rand() * 2) };
+      types[count - 1] = { type: 'timer', before: Math.max(2.3 + Math.floor(rand() * 2), 1.5 + count * 0.28) };
     }
   }
 
@@ -175,11 +175,11 @@ export function buildDailyLevel(day = dayNumber()): LevelDef {
 
   const par = Math.round(count * 0.62 + 1.1);
   const delayBudget = Object.values(types).filter((t) => t.type === 'delay').length * 0.85;
-  const tapPenalty = maxTaps && maxTaps > 1 ? 0.82 : maxTaps === 1 ? 0.88 : 0.95;
-  timeLimit = Math.max(2.2, Math.round((par * 0.85 * tapPenalty + delayBudget * 0.3) * 10) / 10);
+  const tapPenalty = maxTaps && maxTaps > 1 ? 0.92 : maxTaps === 1 ? 0.98 : 1.05;
+  timeLimit = Math.max(2.4, Math.round((par * 0.85 * tapPenalty + delayBudget * 0.3 + 0.25) * 10) / 10);
 
   if (types[count - 1]?.type === 'timer' && types[count - 1].before) {
-    timeLimit = Math.min(timeLimit, (types[count - 1].before as number) + 0.35);
+    timeLimit = Math.min(timeLimit, (types[count - 1].before as number) + 0.6);
   }
 
   const recipe: Recipe = {

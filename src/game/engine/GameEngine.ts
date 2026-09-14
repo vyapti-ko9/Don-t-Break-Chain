@@ -29,8 +29,8 @@ export interface EngineOptions {
   reducedMotion?: boolean;
 }
 
-const PULSE_SPEED = 1.35; // normalized units / second - snappy, less waiting
-const SETTLE_DELAY = 0.42; // seconds of silence before we call the chain broken
+const PULSE_SPEED = 1.5; // normalized units / second - snappy, little reaction time
+const SETTLE_DELAY = 0.38; // seconds of silence before we call the chain broken
 
 export class GameEngine {
   private canvas: HTMLCanvasElement;

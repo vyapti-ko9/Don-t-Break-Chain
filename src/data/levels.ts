@@ -12,28 +12,27 @@ const RECIPES: Recipe[] = [...world1, ...world2, ...world3, ...world4, ...world5
 export const TOTAL_LEVELS = RECIPES.length;
 
 // Global difficulty curve applied on top of every level. One wrong tap ends
-// the run from World 1; derived clocks (and last-five squeeze) stay mean.
-const WORLD_MAX_MISTAKES: Record<number, number> = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 };
-const WORLD_TIME_FACTOR: Record<number, number> = { 1: 0.95, 2: 0.88, 3: 0.82, 4: 0.76, 5: 0.7 };
+// the run — everywhere, from level 1. Every level carries a clock; a level
+// that already authored its own clock keeps it exactly (no double-shrinking),
+// everything else derives one from its (already-tightened) par.
+const WORLD_MAX_MISTAKES = 1;
+const WORLD_TIME_FACTOR: Record<number, number> = { 1: 1.75, 2: 1.6, 3: 1.5, 4: 1.4, 5: 1.3 };
+const MIN_TIME_LIMIT = 2.4;
 
 export const LEVELS: LevelDef[] = RECIPES.map((r, i) => {
   const id = i + 1;
   const world = Math.min(5, Math.floor(i / 20) + 1);
   const def = compileRecipe(id, world, r);
 
-  def.maxMistakes = Math.min(def.maxMistakes ?? WORLD_MAX_MISTAKES[world], WORLD_MAX_MISTAKES[world]);
+  def.maxMistakes = Math.min(def.maxMistakes ?? WORLD_MAX_MISTAKES, WORLD_MAX_MISTAKES);
 
-  const factor = WORLD_TIME_FACTOR[world];
   if (def.timeLimit == null) {
-    def.timeLimit = Math.max(2.2, Math.round(def.par * factor * 10) / 10);
-  } else {
-    // Recipe clocks still take a world-scaled trim so later worlds bite harder.
-    def.timeLimit = Math.max(2.2, Math.round(def.timeLimit * factor * 10) / 10);
+    const factor = WORLD_TIME_FACTOR[world];
+    def.timeLimit = Math.max(MIN_TIME_LIMIT, Math.round(def.par * factor * 10) / 10);
   }
-  // last five of every world get an extra squeeze
-  if (id % 20 >= 16 || id % 20 === 0) {
-    if (def.timeLimit) def.timeLimit = Math.max(2.2, Math.round(def.timeLimit * 0.65 * 10) / 10);
-    def.maxMistakes = 1;
+  // last five of every world get a light extra squeeze
+  if ((id % 20 >= 16 || id % 20 === 0) && def.timeLimit) {
+    def.timeLimit = Math.max(MIN_TIME_LIMIT, Math.round(def.timeLimit * 0.88 * 10) / 10);
   }
   return def;
 });

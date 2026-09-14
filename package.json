@@ -11,7 +11,8 @@
     "typecheck": "tsc -b --noEmit",
     "cap:add:android": "cap add android",
     "cap:sync": "npm run build && cap sync",
-    "cap:open:android": "cap open android"
+    "cap:open:android": "cap open android",
+    "phone": "node scripts/run-phone.mjs"
   },
   "dependencies": {
     "@capacitor-community/admob": "^6.2.0",

@@ -27,6 +27,7 @@ npm run dev          # http://localhost:5173
 | `npm run build` | Type-check (`tsc -b`) + production build to `dist/` |
 | `npm run preview` | Serve the production build locally |
 | `npm run typecheck` | Types only, no emit |
+| `npm run phone` | Build + sync + install on a **physical** Android phone |
 
 ## Android / Capacitor
 
@@ -39,6 +40,20 @@ npx cap add android          # first time only  (or: npm run cap:add:android)
 npx cap sync                  # copy dist/ into the native project
 npx cap open android          # open in Android Studio -> build APK/AAB
 ```
+
+### Run on your phone
+
+1. Enable **Developer options** → **USB debugging** on the phone
+2. Plug in the phone and accept the debugging prompt
+3. Run:
+
+```bash
+npm run phone
+```
+
+That builds the web app, syncs Capacitor, then installs/launches on the connected
+physical device (emulators are skipped). Check the connection with `adb devices`
+if it fails.
 
 `npm run cap:sync` runs `build` + `cap sync` in one step. App id and name live in
 [`capacitor.config.ts`](./capacitor.config.ts).
@@ -91,13 +106,33 @@ or the chain going quiet with required nodes still dark ("CHAIN BROKEN").
 
 ### Difficulty curve
 
-Applied globally in [`data/levels.ts`](./src/data/levels.ts) on top of every
-compiled level: `par` is tightened (`×0.72`), each world gets a **wrong-tap
-budget** (`maxMistakes` 3→3→2→1→1) that ends the run when exceeded, and from
-World 2 on every level gets a **clock** if it didn't already have one. The last
-five levels of each world get an extra squeeze. Pulses travel fast and a broken
-path is called within ~0.4 s. Achievements earned during a run are shown on the
-result screen - no in-play overlays.
+Hard from level 1, on purpose. Applied globally in
+[`data/levels.ts`](./src/data/levels.ts) on top of every compiled level: `par`
+is tightened (`×0.72`), **every level in every world carries a one-mistake
+budget** (`maxMistakes = 1` — one wrong tap ends the run, period), and every
+level has a **clock**, derived from its own par when the recipe didn't author
+one explicitly. The last five levels of each world get an extra squeeze.
+Pulses travel fast (`PULSE_SPEED 1.5`) and a broken path is called within
+`~0.38 s` (`SETTLE_DELAY`). Bombs, fake/hidden wiring, scrambled order,
+non-obvious starts and `maxTaps: 1` one-shot levels start appearing in World 1,
+not held back for later worlds. Every level (and the Daily Challenge, sampled
+over thousands of simulated days) is verified solvable by a headless
+propagation simulation before shipping — see the level-authoring gotchas below
+if you add more. Achievements earned during a run are shown on the result
+screen - no in-play overlays.
+
+### Level-authoring gotchas
+
+- A layout's default chain (`line`, `grid`, `circle`, ...) wires *every*
+  consecutive index automatically. Placing a `bomb` at an index inside that
+  sequence gives it a real incoming edge unless you route around it with
+  `order` (or hand-write `edges` on a `custom` layout).
+- In an `allReverse` recipe, every edge must point **toward** the start, and
+  any node that needs to relay the pulse further upstream must stay
+  `type: 'reverse'`. Motion (`moving`) is independent of `type`, so a mid-chain
+  mover stays reverse-safe with an explicit `types: {i: {type: 'reverse'}}`
+  override; `delay`/`timer` cannot relay in reverse at all (the engine has one
+  type per node) - only put those on a reverse chain's leaves.
 
 ### Node types
 
@@ -111,9 +146,9 @@ and the renderer for glyphs.
 
 100 levels, 20 per world, difficulty ramping by **mechanic**, not by cosmetics:
 
-1. **First Link** (1–20) - tap the right link, direction, timing, first fake link, delay, one-tap.
-2. **Moving Links** (21–40) - drifting links, decoy starts, obstacles, moving + delay/timer.
-3. **Split & Merge** (41–60) - splitters, merge links that need every pulse, simultaneous activation.
+1. **First Link** (1–20) - bombs, fake/hidden wiring, scrambled order, non-obvious starts, one-tap, all live immediately.
+2. **Moving Links** (21–40) - drifting links, obstacles, a first merge link, reverse chains introduced.
+3. **Split & Merge** (41–60) - splitters, merge links that need every real pulse, simultaneous multi-start activation.
 4. **Chaos** (61–80) - hidden links, reversed chains, explosive cascades, limited taps, timers.
 5. **Impossible** (81–100) - everything, layered.
 
@@ -160,4 +195,4 @@ a blocked/absent `AudioContext` is a silent no-op.
 
 ## License
 
-Proprietary - © TDG Design.
+Proprietary - © Opira Solutions.

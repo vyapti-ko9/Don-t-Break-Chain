@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.tdgdesign.dontbreakthechain',
+  appId: 'com.opirasolutions.dontbreakthechain',
   appName: "Don't Break the Chain",
   webDir: 'dist',
   backgroundColor: '#0a0b12',
