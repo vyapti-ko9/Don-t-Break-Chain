@@ -5,6 +5,36 @@ dist-ssr
 .DS_Store
 .vscode/*
 !.vscode/extensions.json
-android
-ios
 *.log
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# --- Signing: never commit. Losing these means never shipping an update. ---
+keystore/
+android/keystore.properties
+*.jks
+*.keystore
+
+# --- Android: the native project IS tracked (it carries the manifest, icons
+# and signing wiring), but its build output and machine-local paths are not.
+android/.gradle/
+android/.idea/
+android/build/
+android/app/build/
+android/app/release/
+android/capacitor-cordova-android-plugins/build/
+android/local.properties
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+android/*.iml
+android/app/*.iml
+*.aab
+*.apk
+
+ios
+
+*.tsbuildinfo
